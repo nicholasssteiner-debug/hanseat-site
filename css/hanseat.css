@@ -25,10 +25,11 @@ a{color:inherit}
 @media (max-width:640px){ .wrap{padding:0 16px} }
 
 /* logos: versão escura no modo escuro */
-.logo-claro{display:none}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .logo-escuro{display:none} :root:not([data-theme="light"]) .logo-claro{display:block} }
-:root[data-theme="dark"] .logo-escuro{display:none}
-:root[data-theme="dark"] .logo-claro{display:block}
+/* !important: regras como ".topo .marca img{display:block}" são mais específicas e mostravam as duas versões juntas */
+.logo-claro{display:none !important}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .logo-escuro{display:none !important} :root:not([data-theme="light"]) .logo-claro{display:block !important} }
+:root[data-theme="dark"] .logo-escuro{display:none !important}
+:root[data-theme="dark"] .logo-claro{display:block !important}
 
 /* topo */
 .topo{background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10}
