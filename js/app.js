@@ -48,13 +48,14 @@
     {id:"desenvolvedores", nome:"Desenvolvedores", logo:"desenvolvedores", simbolo:"simbolo-desenvolvedores", resumo:"Sites, sistemas, automações e painéis de dados sob medida."},
     {id:"bolsa", nome:"Bolsa de Valores", logo:"bolsa", simbolo:"simbolo-bolsa", resumo:"Cotações reais da B3, dólar, euro e bitcoin, atualizados sozinhos."}
   ];
-  var PAGINAS = {inicio:inicio, administracao:administracao, economia:economia, desenvolvedores:desenvolvedores, bolsa:bolsa};
+  var PAGINAS = {inicio:inicio, administracao:administracao, economia:economia, desenvolvedores:desenvolvedores, bolsa:bolsa, convites:convites};
 
   function rota(){
     parar();
     var u = usuario();
     var r = (location.hash.replace(/^#\/?/, "") || "inicio").split("?")[0];
-    if (!PAGINAS[r]) r = "inicio";
+    if (!PAGINAS[r] || (r === "convites" && !(u && u.admin))) r = "inicio";
+    $("navConvites").classList.toggle("oculto", !(u && u.admin));
     document.body.classList.toggle("sem-sessao", !u);
     $("portal").classList.toggle("oculto", !u);
     $("login").classList.toggle("oculto", !!u);
@@ -261,6 +262,51 @@
     });
   }
 
+  /* ---------- Convites (só administradores) ---------- */
+  function convites(u){
+    app.innerHTML =
+      '<span class="rotulo">Acesso ao portal</span><h1 style="margin-top:8px">Convites</h1>' +
+      '<p class="lead">Só quem for convidado aqui consegue criar senha no portal. A pessoa entra em hanseat.com.br, usa "Primeiro acesso" com o e-mail convidado e confirma pelo link que chega na caixa dela.</p>' +
+      '<form class="card" id="fConv" style="margin-top:20px"><h3>Convidar membro</h3>' +
+        '<div class="filtros" style="margin:12px 0 0">' +
+          '<div class="campo" style="flex:1 1 220px"><label for="cNome">Nome</label><input id="cNome" required></div>' +
+          '<div class="campo" style="flex:1 1 260px"><label for="cEmail">E-mail</label><input id="cEmail" type="email" required placeholder="pessoa@exemplo.com"></div>' +
+          campoSel("cArea", "Área", AREAS.map(function(x){ return x.nome; })).replace('<option value="">Todas</option>', '<option value="">—</option>') +
+          '<button class="btn primario" type="submit">Convidar</button>' +
+        '</div><p class="aviso" id="cMsg" role="status" aria-live="polite" style="margin-top:12px">Administradores: Nicholas e Apollo. Eles não precisam de convite.</p></form>' +
+      '<div class="secao"><span class="rotulo">Convidados</span><div class="tabela-box"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Área</th><th>Convidado por</th><th>Data</th><th></th></tr></thead>' +
+        '<tbody id="tbConv"><tr><td colspan="6">Carregando…</td></tr></tbody></table></div></div>';
+
+    function aviso(t, erro){ var m = $("cMsg"); if (m) { m.textContent = t; m.style.color = erro ? "var(--baixa)" : ""; } }
+    function carregar(){
+      HanseatAuth.listarConvites().then(function(l){
+        if (!$("tbConv")) return;
+        l.sort(function(a, b){ return (a.nome || "").localeCompare(b.nome || ""); });
+        $("tbConv").innerHTML = l.map(function(c){
+          var data = c.criadoEm && c.criadoEm.toDate ? dataBR(c.criadoEm.toDate()) : "—";
+          return '<tr><td><strong>' + esc(c.nome) + '</strong></td><td>' + esc(c.email) + '</td><td>' + esc(c.area || "—") + '</td><td>' + esc((c.convidadoPor || "").split("@")[0]) +
+            '</td><td class="num">' + data + '</td><td><button class="btn leve" data-remover="' + esc(c.email) + '">Remover</button></td></tr>';
+        }).join("") || '<tr><td colspan="6">Ninguém convidado ainda.</td></tr>';
+      }).catch(function(e){ if ($("tbConv")) $("tbConv").innerHTML = '<tr><td colspan="6" style="color:var(--baixa)">Não consegui ler os convites: ' + esc(e.message) + '</td></tr>'; });
+    }
+    $("fConv").addEventListener("submit", function(e){
+      e.preventDefault();
+      var nome = $("cNome").value, email = $("cEmail").value.trim();
+      HanseatAuth.convidar(nome, email, $("cArea").value).then(function(erro){
+        if (erro) return aviso(erro, true);
+        aviso(nome + " foi convidado(a). Avise a pessoa para entrar em hanseat.com.br e usar “Primeiro acesso” com " + email + ".");
+        $("fConv").reset(); carregar();
+      });
+    });
+    $("tbConv").addEventListener("click", function(e){
+      var b = e.target.closest("[data-remover]"); if (!b) return;
+      var email = b.getAttribute("data-remover");
+      if (!confirm("Remover o convite de " + email + "? A pessoa perde o acesso ao portal.")) return;
+      HanseatAuth.removerConvite(email).then(function(erro){ if (erro) aviso(erro, true); else carregar(); });
+    });
+    carregar();
+  }
+
   /* ---------- Desenvolvedores ---------- */
   function desenvolvedores(){
     var a = AREAS[2];
@@ -387,7 +433,7 @@
     $("lCampos").classList.toggle("oculto", !!(p && p.tipo === "verificar"));
     $("lVerificar").classList.toggle("oculto", !(p && p.tipo === "verificar"));
     if (p && p.tipo === "verificar") { $("lVerEmail").textContent = p.email; msg(""); }
-    else if (p && p.tipo === "sem-acesso") { msg("O e-mail " + p.email + " não está liberado para o portal.", true); HanseatAuth.sair(); }
+    else if (p && p.tipo === "sem-acesso") { msg("O e-mail " + p.email + " não foi convidado para o portal. Peça o convite a um administrador do Hanseat.", true); HanseatAuth.sair(); }
     if (usuario() && !location.hash) location.hash = "#/inicio"; else rota();
   });
   $("btTema").addEventListener("click", function(){
