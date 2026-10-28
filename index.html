@@ -20,10 +20,24 @@
       <img class="marca logo-escuro" src="assets/hanseat.svg" alt="Hanseat">
       <img class="marca logo-claro" src="assets/hanseat-claro.svg" alt="Hanseat">
       <h1 style="font-size:30px">Portal do membro</h1>
-      <div class="campo"><label for="lNome">Nome</label><input id="lNome" autocomplete="name" required></div>
-      <div class="campo"><label for="lEmail">E-mail</label><input id="lEmail" type="email" autocomplete="email"></div>
-      <button class="btn primario" type="submit">Entrar</button>
-      <p class="aviso">Acesso de demonstração: o nome fica salvo só neste navegador e não há senha.</p>
+      <div id="lCampos">
+        <div class="campo"><label for="lEmail">E-mail</label><input id="lEmail" type="email" autocomplete="username" placeholder="nome@hanseat.com.br" required></div>
+        <div class="campo" style="margin-top:14px"><label for="lSenha">Senha</label><input id="lSenha" type="password" autocomplete="current-password" minlength="6" required></div>
+        <button class="btn primario" type="submit" id="btEntrar" style="margin-top:14px;width:100%">Entrar</button>
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <button class="btn leve" type="button" id="btPrimeiro">Primeiro acesso</button>
+          <button class="btn leve" type="button" id="btEsqueci">Esqueci a senha</button>
+        </div>
+      </div>
+      <div id="lVerificar" class="oculto">
+        <p>Enviamos um link de confirmação para <strong id="lVerEmail"></strong>. Abra o e-mail, clique no link e depois volte aqui.</p>
+        <button class="btn primario" type="button" id="btJaConfirmei" style="width:100%">Já confirmei</button>
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px">
+          <button class="btn leve" type="button" id="btReenviar">Reenviar e-mail</button>
+          <button class="btn leve" type="button" id="btSairVer">Usar outro e-mail</button>
+        </div>
+      </div>
+      <p class="aviso" id="lMsg" role="status" aria-live="polite">Acesso restrito aos membros da rede.</p>
     </form>
   </div>
 </section>
@@ -56,5 +70,6 @@
 <script src="js/membros.js"></script>
 <script src="js/mercado.js"></script>
 <script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
 </body>
 </html>

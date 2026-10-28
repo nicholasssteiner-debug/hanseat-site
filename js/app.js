@@ -34,10 +34,8 @@
     tick(); contagem = setInterval(tick, 1000);
   }
 
-  /* ---------- sessão (acesso de demonstração) ---------- */
-  function usuario(){ try { return JSON.parse(localStorage.getItem("hanseat.usuario") || "null"); } catch(e){ return null; } }
-  function entrar(nome, email){ try { localStorage.setItem("hanseat.usuario", JSON.stringify({nome:nome, email:email})); } catch(e){} }
-  function sair(){ try { localStorage.removeItem("hanseat.usuario"); } catch(e){} }
+  /* ---------- sessão: quem está logado vem do js/auth.js (Firebase) ---------- */
+  function usuario(){ return window.HanseatUsuario || null; }
 
   /* ---------- tema ---------- */
   function aplicarTema(t){ if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
@@ -353,14 +351,45 @@
   }
 
   /* ---------- eventos globais ---------- */
+  function msg(t, erro){ var m = $("lMsg"); m.textContent = t; m.style.color = erro ? "var(--baixa)" : ""; }
+  function ocupado(sim){ Array.prototype.forEach.call(document.querySelectorAll("#formLogin button"), function(b){ b.disabled = sim; }); }
+  function chamar(promessa, ok){
+    ocupado(true);
+    promessa.then(function(erro){ ocupado(false); if (erro) msg(erro, true); else if (ok) msg(ok); });
+  }
+  function semAuth(){ if (!window.HanseatAuth) { msg("O login ainda está carregando. Tente de novo em instantes.", true); return true; } }
   $("formLogin").addEventListener("submit", function(e){
     e.preventDefault();
-    var nome = $("lNome").value.trim(), email = $("lEmail").value.trim();
-    if (!nome) { $("lNome").focus(); return; }
-    entrar(nome, email);
-    if (!location.hash) location.hash = "#/inicio"; else rota();
+    if (semAuth()) return;
+    msg("Entrando…");
+    chamar(HanseatAuth.entrar($("lEmail").value, $("lSenha").value));
   });
-  $("btSair").addEventListener("click", function(){ sair(); location.hash = ""; rota(); });
+  $("btPrimeiro").addEventListener("click", function(){
+    if (semAuth()) return;
+    if (!$("lEmail").value || $("lSenha").value.length < 6) { msg("Digite o seu e-mail @hanseat.com.br e escolha uma senha de pelo menos 6 caracteres; depois clique em Primeiro acesso.", true); return; }
+    chamar(HanseatAuth.primeiroAcesso($("lEmail").value, $("lSenha").value));
+  });
+  $("btEsqueci").addEventListener("click", function(){
+    if (semAuth()) return;
+    if (!$("lEmail").value) { msg("Digite o seu e-mail e clique de novo em Esqueci a senha.", true); return; }
+    chamar(HanseatAuth.esqueci($("lEmail").value), "Enviamos um link para criar uma nova senha. Confira o seu e-mail.");
+  });
+  $("btReenviar").addEventListener("click", function(){ chamar(HanseatAuth.reenviar(), "E-mail de confirmação reenviado."); });
+  $("btJaConfirmei").addEventListener("click", function(){
+    ocupado(true);
+    HanseatAuth.jaConfirmei().then(function(){ ocupado(false); if (window.HanseatPendente) msg("Ainda não aparece como confirmado. Clique no link do e-mail e tente de novo.", true); });
+  });
+  $("btSairVer").addEventListener("click", function(){ HanseatAuth.sair(); });
+  $("btSair").addEventListener("click", function(){ if (window.HanseatAuth) HanseatAuth.sair(); location.hash = ""; });
+  // o estado do login chega do Firebase; enquanto isso a tela de entrada mostra "Carregando…"
+  window.addEventListener("hanseat:auth", function(){
+    var p = window.HanseatPendente;
+    $("lCampos").classList.toggle("oculto", !!(p && p.tipo === "verificar"));
+    $("lVerificar").classList.toggle("oculto", !(p && p.tipo === "verificar"));
+    if (p && p.tipo === "verificar") { $("lVerEmail").textContent = p.email; msg(""); }
+    else if (p && p.tipo === "sem-acesso") { msg("O e-mail " + p.email + " não está liberado para o portal.", true); HanseatAuth.sair(); }
+    if (usuario() && !location.hash) location.hash = "#/inicio"; else rota();
+  });
   $("btTema").addEventListener("click", function(){
     var escuro = document.documentElement.getAttribute("data-theme") === "dark" ||
       (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
