@@ -54,12 +54,16 @@
     parar();
     var u = usuario();
     var r = (location.hash.replace(/^#\/?/, "") || "inicio").split("?")[0];
+    // sem sessão: o site institucional, e o login só em #/entrar (botão "Painel do membro")
+    if (u && r === "entrar") { location.hash = "#/inicio"; return; }
+    var entrar = !u && r === "entrar";
     if (!PAGINAS[r] || (r === "convites" && !(u && u.admin))) r = "inicio";
     $("navConvites").classList.toggle("oculto", !(u && u.admin));
     document.body.classList.toggle("sem-sessao", !u);
     $("portal").classList.toggle("oculto", !u);
-    $("login").classList.toggle("oculto", !!u);
-    if (!u) { document.title = "Entrar · Hanseat"; return; }
+    $("login").classList.toggle("oculto", !entrar);
+    $("site").classList.toggle("oculto", !!u || entrar);
+    if (!u) { document.title = entrar ? "Entrar · Hanseat" : "Hanseat · Hub Associativo de Negócios, Serviços, Empreendimentos, Autônomos e Trabalho"; window.scrollTo(0, 0); return; }
     $("nomeUsuario").textContent = u.nome.split(" ")[0];
     $("avatarUsuario").textContent = iniciais(u.nome);
     Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function(a){
@@ -436,10 +440,21 @@
     else if (p && p.tipo === "sem-acesso") { msg("O e-mail " + p.email + " não foi convidado para o portal. Peça o convite a um administrador do Hanseat.", true); HanseatAuth.sair(); }
     if (usuario() && !location.hash) location.hash = "#/inicio"; else rota();
   });
-  $("btTema").addEventListener("click", function(){
+  function alternarTema(){
     var escuro = document.documentElement.getAttribute("data-theme") === "dark" ||
       (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
     var t = escuro ? "light" : "dark"; aplicarTema(t); try { localStorage.setItem("hanseat.tema", t); } catch(e){}
+  }
+  $("btTema").addEventListener("click", alternarTema);
+  $("btTemaSite").addEventListener("click", alternarTema);
+  // links internos do site rolam até a seção sem mexer no hash (o hash é das rotas do portal)
+  Array.prototype.forEach.call(document.querySelectorAll("[data-rolar]"), function(a){
+    a.addEventListener("click", function(e){
+      var alvo = document.querySelector(a.getAttribute("href"));
+      if (!alvo) return;
+      e.preventDefault();
+      alvo.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+    });
   });
   window.addEventListener("hashchange", rota);
   rota();

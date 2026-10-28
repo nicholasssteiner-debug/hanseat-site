@@ -13,10 +13,137 @@
 </head>
 <body>
 
+<!-- página institucional: o que qualquer visitante vê em hanseat.com.br -->
+<div id="site">
+  <header class="topo">
+    <div class="wrap">
+      <a class="marca" href="#" aria-label="Hanseat — início">
+        <img class="logo-escuro" src="assets/hanseat.svg" alt="Hanseat"><img class="logo-claro" src="assets/hanseat-claro.svg" alt="Hanseat">
+      </a>
+      <nav class="nav" aria-label="Seções">
+        <a href="#quem-somos" data-rolar>Quem somos</a>
+        <a href="#proposito" data-rolar>Propósito</a>
+        <a href="#areas" data-rolar>Áreas</a>
+        <a href="#como-funciona" data-rolar>Como funciona</a>
+        <a href="#contato" data-rolar>Contato</a>
+      </nav>
+      <div class="usuario">
+        <button class="btn leve" id="btTemaSite" aria-label="Alternar tema claro ou escuro">Tema</button>
+        <a class="btn primario" href="#/entrar">Painel do membro</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grade">
+        <div>
+          <span class="rotulo">Hub Associativo de Negócios, Serviços, Empreendimentos, Autônomos e Trabalho</span>
+          <h1 class="hero-titulo">Profissionais independentes, uma só marca.</h1>
+          <p class="lead">O Hanseat reúne consultores, analistas e desenvolvedores que trabalham por conta própria e compartilham nome, padrão de qualidade e rede de contatos. Você contrata quem entende do assunto, com o respaldo de uma marca.</p>
+          <div class="hero-acoes">
+            <a class="btn primario" href="#areas" data-rolar>Conheça as áreas</a>
+            <a class="btn" href="#contato" data-rolar>Fale conosco</a>
+          </div>
+        </div>
+        <div class="selo-hero"><img src="assets/selo.svg" alt="Selo Hanseat"></div>
+      </div>
+    </section>
+
+    <section class="bloco" id="quem-somos">
+      <div class="wrap grade g2 quem">
+        <div>
+          <span class="rotulo">Quem somos</span>
+          <h2 class="titulo-bloco">Uma rede, não uma empresa de funcionários.</h2>
+        </div>
+        <div>
+          <p>O nome vem das antigas ligas hanseáticas: cidades e mercadores independentes que se associavam para negociar com mais força e mais confiança do que conseguiriam sozinhos.</p>
+          <p>O Hanseat segue a mesma ideia. A marca pertence aos seus cotitulares; os demais membros são profissionais licenciados (autônomos, MEI ou com empresa própria) que usam a marca, seguem o mesmo regimento e atendem e faturam em nome próprio.</p>
+          <p style="margin:0">Para o cliente, isso significa falar direto com quem faz o trabalho, sem intermediário, e contar com uma rede inteira por trás quando o projeto pede mais de uma especialidade.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="proposito">
+      <div class="wrap">
+        <div class="lema">
+          <span class="rotulo">Nosso lema</span>
+          <p class="lema-frase">“Cada um por conta própria, nunca sozinho.”</p>
+          <p class="origem">No alemão antigo, <em>hansa</em> queria dizer companhia, um grupo que segue junto. Durante séculos, mercadores e cidades livres do Norte da Europa se uniram sob esse nome. Nenhuma dessas cidades obedecia às outras, e mesmo assim, juntas, mantinham rotas, portos e uma confiança que ia de um mar a outro. O Hanseat nasce dessa mesma ideia: a liberdade de cada um é o que dá sentido a uma união.</p>
+        </div>
+        <div class="grade g2" style="margin-top:40px">
+          <div class="card pilar"><span class="rotulo">Missão</span>
+            <p>Unir quem trabalha por conta própria numa liga em que cada um continua dono do seu ofício, do seu tempo e do seu nome, mas nunca enfrenta o mar sozinho. Liberdade e pertencimento não se excluem: um sustenta o outro.</p></div>
+          <div class="card pilar"><span class="rotulo">Visão</span>
+            <p>Uma liga que atravesse gerações, como a Hansa atravessou séculos. Não queremos ser os maiores, e sim os mais confiáveis: que o nome Hanseat valha, onde quer que chegue, o que valia a palavra de um mercador hanseático nos portos do Norte, um acordo já selado.</p></div>
+        </div>
+        <span class="rotulo" style="display:block;margin:40px 0 12px">Valores</span>
+        <div class="valores">
+          <div class="card pilar"><h3>A palavra</h3><p>O mercador hanseático fechava negócio com um aperto de mão. Entre nós, a palavra dada vem antes do contrato.</p></div>
+          <div class="card pilar"><h3>A liberdade</h3><p>Cidade livre não tem senhor. Cada membro responde por si, escolhe seu caminho e assina seu próprio trabalho.</p></div>
+          <div class="card pilar"><h3>A liga</h3><p>Ninguém atravessa o mar sozinho. A força de um é reserva de todos, e o sucesso de um abre porto para os outros.</p></div>
+          <div class="card pilar"><h3>A honra no ofício</h3><p>O mercador honrado sabia que lucro sem honra empobrece. Fazemos bem feito mesmo quando ninguém está olhando.</p></div>
+          <div class="card pilar"><h3>A travessia</h3><p><em>Navigare necesse est.</em> A Hansa vivia de viagens. Aprender, corrigir a rota e seguir adiante faz parte do caminho.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="areas">
+      <div class="wrap">
+        <span class="rotulo">Áreas de atuação</span>
+        <h2 class="titulo-bloco">Quatro frentes, uma mesma rede.</h2>
+        <div class="grade g4" style="margin-top:24px">
+          <article class="area"><div class="faixa"><img src="assets/simbolo-administracao.svg" alt=""></div>
+            <div class="txt"><h3>Administração</h3><p>Processos, rotinas, departamento pessoal e organização de documentos para pequenos negócios e profissionais.</p></div></article>
+          <article class="area"><div class="faixa"><img src="assets/simbolo-economia.svg" alt=""></div>
+            <div class="txt"><h3>Economia</h3><p>Consultoria financeira, planejamento tributário, controladoria e leitura dos indicadores econômicos.</p></div></article>
+          <article class="area"><div class="faixa"><img src="assets/simbolo-desenvolvedores.svg" alt=""></div>
+            <div class="txt"><h3>Desenvolvedores</h3><p>Sites, sistemas internos, automações, integrações e painéis de dados sob medida.</p></div></article>
+          <article class="area"><div class="faixa"><img src="assets/simbolo-bolsa.svg" alt=""></div>
+            <div class="txt"><h3>Bolsa de Valores</h3><p>Análise e educação sobre o mercado de capitais, com acompanhamento de cotações e indicadores.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloco" id="como-funciona">
+      <div class="wrap grade g2">
+        <div>
+          <span class="rotulo">Como funciona</span>
+          <h2 class="titulo-bloco">Do primeiro contato à entrega.</h2>
+          <p class="lead">Cada membro responde pelo próprio trabalho. A marca garante o padrão.</p>
+        </div>
+        <ol class="passos">
+          <li><div><h3>Você conta o que precisa</h3><p>Pelo contato abaixo ou direto com um membro que você já conhece.</p></div></li>
+          <li><div><h3>A rede indica o profissional</h3><p>O pedido vai para o membro da área certa; se o projeto envolve mais de uma frente, outros membros entram junto.</p></div></li>
+          <li><div><h3>Proposta e contrato direto</h3><p>O profissional apresenta escopo, prazo e valor, e contrata e fatura em nome próprio.</p></div></li>
+          <li><div><h3>Entrega com o padrão Hanseat</h3><p>Todos os membros seguem o mesmo regimento de qualidade e de conduta da marca.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="bloco faixa-tijolo" id="contato">
+      <div class="wrap contato">
+        <div>
+          <span class="rotulo">Contato</span>
+          <h2 class="titulo-bloco">Vamos conversar?</h2>
+          <p class="lead">Conte em poucas linhas o que você precisa. Respondemos e indicamos o membro certo.</p>
+        </div>
+        <div class="contato-acoes">
+          <a class="btn branco" href="mailto:contato@hanseat.com.br">contato@hanseat.com.br</a>
+          <p class="nota">É profissional e quer fazer parte da rede? A entrada é por convite; escreva para o mesmo endereço.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape"><div class="wrap"><span>Hanseat · Hub Associativo de Negócios, Serviços, Empreendimentos, Autônomos e Trabalho</span><span>hanseat.com.br</span><span style="flex-basis:100%">Os membros da rede Hanseat são profissionais independentes, licenciados para usar a marca, que atendem e faturam em nome próprio.</span></div></footer>
+</div>
+
 <section id="login" class="login oculto" aria-label="Entrar">
   <div class="lado"><img src="assets/selo.svg" alt="Selo Hanseat"></div>
   <div class="form">
     <form id="formLogin">
+      <a class="voltar" href="#">← Voltar ao site</a>
       <img class="marca logo-escuro" src="assets/hanseat.svg" alt="Hanseat">
       <img class="marca logo-claro" src="assets/hanseat-claro.svg" alt="Hanseat">
       <h1 style="font-size:30px">Portal do membro</h1>

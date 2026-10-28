@@ -155,6 +155,51 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .aviso{font-size:13px; color:var(--muted); border-left:0; background:color-mix(in srgb,var(--fg) 5%,transparent); padding:10px 12px}
 @media (max-width:760px){ .login{grid-template-columns:1fr} .login .lado{min-height:200px} }
 
+.login .voltar{font-size:14px; color:var(--muted); text-decoration:none; align-self:flex-start; margin-bottom:8px}
+.login .voltar:hover{color:var(--fg)}
+
+/* site institucional */
+#site main{padding:0}
+.hero{padding:72px 0}
+.hero-grade{display:grid; grid-template-columns:1.25fr 1fr; gap:40px; align-items:center}
+.hero-titulo{font-size:clamp(36px,5.6vw,64px); margin:16px 0 20px}
+.hero .lead{font-size:19px}
+.hero-acoes{display:flex; gap:12px; flex-wrap:wrap; margin-top:28px}
+.hero .selo-hero{min-height:380px}
+.hero .selo-hero img{width:min(280px,70%)}
+.bloco{padding:72px 0; border-top:1px solid var(--line); scroll-margin-top:68px}
+.titulo-bloco{font-size:clamp(26px,3.4vw,36px); line-height:1.15; margin:10px 0 12px; max-width:20ch}
+.quem p{font-size:17px; max-width:62ch}
+.lema{text-align:center; max-width:820px; margin:0 auto}
+.lema-frase{font-size:clamp(28px,4.2vw,46px); line-height:1.15; font-weight:600; margin:12px 0 0; color:var(--fg)}
+.lema-frase::after{content:""; display:block; width:56px; height:3px; background:var(--tijolo); margin:22px auto 0}
+.pilar{border-top:3px solid var(--tijolo)}
+.pilar p{margin:10px 0 0; font-size:16px}
+.pilar p{line-height:1.6}
+.origem{font-size:17px; color:var(--muted); max-width:66ch; margin:28px auto 0; line-height:1.7}
+.valores{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.valores .pilar p{font-size:15px; color:var(--muted)}
+#areas .area{min-height:0}
+#areas .area:hover{transform:none; border-color:var(--line)}
+.faixa-tijolo{background:var(--tijolo); color:#fff; border-top:0}
+.faixa-tijolo .rotulo, .faixa-tijolo .lead{color:rgba(255,255,255,.82)}
+.contato{display:grid; grid-template-columns:1.2fr 1fr; gap:32px; align-items:center}
+.contato-acoes{display:flex; flex-direction:column; gap:14px; align-items:flex-start}
+.btn.branco{background:#fff; border-color:#fff; color:var(--tijolo); text-transform:none; letter-spacing:0; font-size:17px; padding:12px 20px}
+.btn.branco:hover{background:transparent; color:#fff}
+.nota{font-size:14px; color:rgba(255,255,255,.82); margin:0; max-width:44ch}
+@media (max-width:860px){
+  .hero{padding:40px 0 48px}
+  .hero-grade, .contato{grid-template-columns:1fr; gap:28px}
+  .hero .selo-hero{min-height:220px}
+  .hero .selo-hero img{width:160px}
+  .bloco{padding:48px 0}
+}
+@media (max-width:760px){
+  #site .usuario .btn.primario{padding:8px 12px; min-height:40px; font-size:12px}
+  #btTemaSite{display:none}
+}
+
 .rodape{border-top:1px solid var(--line); padding:20px 0; font-size:13px; color:var(--muted)}
 .rodape .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
 .erro-box{background:var(--card); border:1px solid var(--baixa); padding:16px 20px; margin:12px 0}
