@@ -4,20 +4,57 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hanseat</title>
-<style>
-  :root { --bg:#f7f7f5; --fg:#1d1d1f; --muted:#6e6e73; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#111; --fg:#f2f2f2; --muted:#9a9a9f; } }
-  html,body { height:100%; margin:0; }
-  body { display:grid; place-items:center; background:var(--bg); color:var(--fg);
-         font-family:system-ui,-apple-system,"Segoe UI",sans-serif; padding:0 16px; text-align:center; }
-  h1 { font-size:clamp(2rem,6vw,3.5rem); letter-spacing:.04em; margin:0 0 .5rem; }
-  p { color:var(--muted); margin:0; }
-</style>
+<meta name="description" content="Hanseat — Hub Associativo de Negócios, Serviços, Empreendimentos, Autônomos e Trabalho.">
+<link rel="icon" href="assets/simbolo-administracao.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300..700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="css/hanseat.css">
 </head>
 <body>
-  <main>
-    <h1>Hanseat</h1>
-    <p>Site em construção.</p>
-  </main>
+
+<section id="login" class="login oculto" aria-label="Entrar">
+  <div class="lado"><img src="assets/selo.svg" alt="Selo Hanseat"></div>
+  <div class="form">
+    <form id="formLogin">
+      <img class="marca logo-escuro" src="assets/hanseat.svg" alt="Hanseat">
+      <img class="marca logo-claro" src="assets/hanseat-claro.svg" alt="Hanseat">
+      <h1 style="font-size:30px">Portal do membro</h1>
+      <div class="campo"><label for="lNome">Nome</label><input id="lNome" autocomplete="name" required></div>
+      <div class="campo"><label for="lEmail">E-mail</label><input id="lEmail" type="email" autocomplete="email"></div>
+      <button class="btn primario" type="submit">Entrar</button>
+      <p class="aviso">Acesso de demonstração: o nome fica salvo só neste navegador e não há senha.</p>
+    </form>
+  </div>
+</section>
+
+<div id="portal" class="oculto">
+  <header class="topo">
+    <div class="wrap">
+      <a class="marca" href="#/inicio" aria-label="Hanseat — início">
+        <img class="logo-escuro" src="assets/hanseat.svg" alt="Hanseat"><img class="logo-claro" src="assets/hanseat-claro.svg" alt="Hanseat">
+      </a>
+      <nav class="nav" aria-label="Áreas">
+        <a href="#/inicio">Início</a>
+        <a href="#/administracao">Administração</a>
+        <a href="#/economia">Economia</a>
+        <a href="#/desenvolvedores">Desenvolvedores</a>
+        <a href="#/bolsa">Bolsa</a>
+      </nav>
+      <div class="usuario">
+        <button class="btn leve" id="btTema" aria-label="Alternar tema claro ou escuro">Tema</button>
+        <div class="avatar" id="avatarUsuario" aria-hidden="true"></div>
+        <span id="nomeUsuario"></span>
+        <button class="btn leve" id="btSair">Sair</button>
+      </div>
+    </div>
+  </header>
+  <main class="wrap" id="app"></main>
+  <footer class="rodape"><div class="wrap"><span>Hanseat · Hub Associativo de Negócios, Serviços, Empreendimentos, Autônomos e Trabalho</span><span>hanseat.com.br</span></div></footer>
+</div>
+
+<script src="js/funcionarios.js"></script>
+<script src="js/mercado.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
