@@ -131,7 +131,7 @@ input[type=search]{min-width:240px}
 
 /* barras horizontais */
 .barras{display:flex; flex-direction:column; gap:10px}
-.barra{display:grid; grid-template-columns:140px 1fr 40px; gap:10px; align-items:center; font-size:14px}
+.barra{display:grid; grid-template-columns:118px 1fr 28px; gap:10px; align-items:center; font-size:14px}
 .barra .trilho{height:10px; background:color-mix(in srgb,var(--fg) 8%,transparent)}
 .barra .cheio{height:100%; background:var(--tijolo)}
 

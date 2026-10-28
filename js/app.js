@@ -1,7 +1,7 @@
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var M = window.HanseatMercado;
-  var FUNC = window.HANSEAT_FUNCIONARIOS || [];
+  var MEMB = window.HANSEAT_MEMBROS || [];
   var app = $("app");
   var timer = null, contagem = null;
 
@@ -108,81 +108,102 @@
   }
 
   /* ---------- Administração ---------- */
+  // Situação do membro: cotitular (dono da marca), em experiência, licença vencida, a renovar (até 60 dias) ou ativa
+  var HOJE = new Date(); HOJE.setHours(12, 0, 0, 0);
+  function dia(s){ return new Date(s + "T12:00"); }
+  function situacao(m){
+    if (m.papel === "Cotitular") return m.admin ? "Administrador(a) da marca" : "Cotitular";
+    if (m.experiencia) return "Em experiência";
+    var dias = Math.round((dia(m.licencaAte) - HOJE) / 864e5);
+    if (dias < 0) return "Licença vencida";
+    if (dias <= 60) return "Renovar em breve";
+    return "Licença ativa";
+  }
+  function chipSit(s){ return /vencida/.test(s) ? "afastado" : /Renovar|experiência/.test(s) ? "ferias" : "ativo"; }
+  function nomeDe(id){ var c = MEMB.filter(function(m){ return m.id === id; })[0]; return c ? c.nome : "—"; }
+
   function administracao(){
     var a = AREAS[0];
     var areas = AREAS.map(function(x){ return x.nome; });
-    app.innerHTML = cabecalho(a, "Consultoria administrativa", "Organização de processos, gestão de pessoas e rotinas administrativas para os membros do Hub.") +
+    var situacoes = ["Administrador(a) da marca","Cotitular","Licença ativa","Renovar em breve","Em experiência","Licença vencida"];
+    app.innerHTML = cabecalho(a, "Consultoria administrativa", "Membros da rede que organizam processos, rotinas e documentos de pequenos negócios e de outros profissionais independentes.") +
       '<div class="grade g3">' +
-        servico("Processos e rotinas", "Mapeamento do fluxo atual, eliminação de retrabalho e manual de procedimentos da empresa.") +
-        servico("Gestão de pessoas", "Estrutura de cargos, admissão, departamento pessoal e acompanhamento de férias e afastamentos.") +
+        servico("Processos e rotinas", "Mapeamento do fluxo atual, eliminação de retrabalho e manual de procedimentos do negócio do cliente.") +
+        servico("Pessoas e departamento pessoal", "Apoio ao cliente que tem equipe: admissão, folha, férias e obrigações trabalhistas.") +
         servico("Contratos e documentos", "Modelos padronizados, controle de vigência e organização da documentação do negócio.") +
       '</div>' +
-      '<div class="secao"><span class="rotulo">Quadro de colaboradores</span>' +
-        '<p class="aviso" style="margin-bottom:16px">Dados fictícios, para demonstração do portal.</p>' +
-        '<div class="grade g4" id="kpisFunc"></div>' +
-        '<div class="grade g2" style="margin-top:16px"><div class="card"><h3>Por área</h3><div class="barras" id="barArea" style="margin-top:14px"></div></div>' +
-          '<div class="card"><h3>Por vínculo</h3><div class="barras" id="barVinc" style="margin-top:14px"></div></div></div>' +
+      '<div class="secao"><span class="rotulo">Membros da rede</span>' +
+        '<p class="aviso" style="margin-bottom:16px">O Hanseat não tem funcionários. Os cotitulares são os donos da marca; os demais são profissionais independentes (autônomos, MEI ou com empresa própria), licenciados para usar a marca, que atendem e faturam em nome próprio. Dados fictícios, para demonstração do portal.</p>' +
+        '<div class="grade g4" id="kpisMemb"></div>' +
+        '<div class="grade g3" style="margin-top:16px"><div class="card"><h3>Por área</h3><div class="barras" id="barArea" style="margin-top:14px"></div></div>' +
+          '<div class="card"><h3>Por forma de atuação</h3><div class="barras" id="barAtu" style="margin-top:14px"></div></div>' +
+          '<div class="card"><h3>Licenciados por cotitular</h3><div class="barras" id="barInd" style="margin-top:14px"></div></div></div>' +
         '<div class="filtros" style="margin-top:24px">' +
-          '<div class="campo"><label for="fBusca">Buscar</label><input type="search" id="fBusca" placeholder="Nome, cargo ou matrícula"></div>' +
-          campoSel("fArea", "Área", areas) + campoSel("fVinc", "Vínculo", ["CLT","PJ","Sócio","Estágio"]) + campoSel("fSit", "Situação", ["Ativo","Férias","Afastado"]) +
+          '<div class="campo"><label for="fBusca">Buscar</label><input type="search" id="fBusca" placeholder="Nome ou especialidade"></div>' +
+          campoSel("fArea", "Área", areas) + campoSel("fAtu", "Atuação", ["Autônomo (CPF)","MEI","ME"]) + campoSel("fSit", "Situação", situacoes) +
         '</div>' +
-        '<div class="tabela-box"><table><thead><tr><th>Matrícula</th><th>Nome</th><th>Cargo</th><th>Área</th><th>Vínculo</th><th>Cidade</th><th>Admissão</th><th>Situação</th></tr></thead><tbody id="tbFunc"></tbody></table></div>' +
-        '<p class="rotulo" id="contFunc" style="margin-top:10px"></p>' +
+        '<div class="tabela-box"><table><thead><tr><th>Nome</th><th>Especialidade</th><th>Área</th><th>Papel</th><th>Atuação</th><th>Cidade</th><th>Membro desde</th><th>Licença até</th><th>Situação</th></tr></thead><tbody id="tbMemb"></tbody></table></div>' +
+        '<p class="rotulo" id="contMemb" style="margin-top:10px"></p>' +
       '</div>' +
       '<dialog id="ficha"></dialog>';
 
-    var ativos = FUNC.filter(function(f){ return f.situacao === "Ativo"; }).length;
-    var ano = new Date().getFullYear();
-    var novos = FUNC.filter(function(f){ return +f.admissao.slice(0, 4) === ano; }).length;
-    $("kpisFunc").innerHTML =
-      kpiSimples("Colaboradores", FUNC.length, "no quadro") +
-      kpiSimples("Em atividade", ativos, Math.round(ativos / FUNC.length * 100) + "% do quadro") +
-      kpiSimples("Férias ou afastados", FUNC.length - ativos, "hoje") +
-      kpiSimples("Admitidos em " + ano, novos, "desde janeiro");
-    barras("barArea", contar("area"));
-    barras("barVinc", contar("vinculo"));
+    var cot = MEMB.filter(function(m){ return m.papel === "Cotitular"; }), lic = MEMB.filter(function(m){ return m.papel !== "Cotitular"; });
+    var exp = lic.filter(function(m){ return m.experiencia; }).length;
+    var renovar = lic.filter(function(m){ var s = situacao(m); return s === "Renovar em breve" || s === "Licença vencida"; }).length;
+    $("kpisMemb").innerHTML =
+      kpiSimples("Membros", MEMB.length, cot.length + " cotitulares e " + lic.length + " licenciados") +
+      kpiSimples("Cotitulares", cot.length, "donos da marca") +
+      kpiSimples("Em experiência", exp, "período inicial do Regimento") +
+      kpiSimples("Licenças a renovar", renovar, "vencidas ou vencendo em 60 dias");
+    barras("barArea", contar(MEMB, "area"));
+    barras("barAtu", contar(MEMB, "atuacao"));
+    barras("barInd", contar(lic.map(function(m){ return {cot:nomeDe(m.indicadoPor).split(" ")[0]}; }), "cot"));
 
     function filtrar(){
-      var b = $("fBusca").value.trim().toLowerCase(), ar = $("fArea").value, vi = $("fVinc").value, si = $("fSit").value;
-      var l = FUNC.filter(function(f){
-        return (!ar || f.area === ar) && (!vi || f.vinculo === vi) && (!si || f.situacao === si) &&
-          (!b || (f.nome + " " + f.cargo + " " + f.mat).toLowerCase().indexOf(b) >= 0);
+      var b = $("fBusca").value.trim().toLowerCase(), ar = $("fArea").value, at = $("fAtu").value, si = $("fSit").value;
+      var l = MEMB.filter(function(m){
+        return (!ar || m.area === ar) && (!at || m.atuacao === at) && (!si || situacao(m) === si) &&
+          (!b || (m.nome + " " + m.especialidade).toLowerCase().indexOf(b) >= 0);
       });
-      $("tbFunc").innerHTML = l.map(function(f){
-        return '<tr class="clicavel" data-mat="' + f.mat + '" tabindex="0"><td class="num">' + f.mat + '</td><td><strong>' + esc(f.nome) + '</strong></td><td>' + esc(f.cargo) +
-          '</td><td>' + f.area + '</td><td>' + f.vinculo + '</td><td>' + f.cidade + '</td><td class="num">' + dataBR(new Date(f.admissao + "T12:00")) +
-          '</td><td><span class="chip ' + chipSit(f.situacao) + '">' + f.situacao + '</span></td></tr>';
-      }).join("") || '<tr><td colspan="8">Nenhum colaborador com esses filtros.</td></tr>';
-      $("contFunc").textContent = l.length + " de " + FUNC.length + " colaboradores";
+      $("tbMemb").innerHTML = l.map(function(m){
+        var s = situacao(m);
+        return '<tr class="clicavel" data-id="' + m.id + '" tabindex="0"><td><strong>' + esc(m.nome) + '</strong></td><td>' + esc(m.especialidade) +
+          '</td><td>' + m.area + '</td><td>' + m.papel + '</td><td>' + m.atuacao + '</td><td>' + m.cidade + '</td><td class="num">' + dataBR(dia(m.desde)) +
+          '</td><td class="num">' + (m.licencaAte ? dataBR(dia(m.licencaAte)) : "—") + '</td><td><span class="chip ' + chipSit(s) + '">' + s + '</span></td></tr>';
+      }).join("") || '<tr><td colspan="9">Nenhum membro com esses filtros.</td></tr>';
+      $("contMemb").textContent = l.length + " de " + MEMB.length + " membros";
     }
-    ["fBusca","fArea","fVinc","fSit"].forEach(function(id){ $(id).addEventListener("input", filtrar); });
-    $("tbFunc").addEventListener("click", function(e){ var tr = e.target.closest("tr[data-mat]"); if (tr) ficha(tr.getAttribute("data-mat")); });
-    $("tbFunc").addEventListener("keydown", function(e){ if (e.key === "Enter") { var tr = e.target.closest("tr[data-mat]"); if (tr) ficha(tr.getAttribute("data-mat")); } });
+    ["fBusca","fArea","fAtu","fSit"].forEach(function(id){ $(id).addEventListener("input", filtrar); });
+    $("tbMemb").addEventListener("click", function(e){ var tr = e.target.closest("tr[data-id]"); if (tr) ficha(tr.getAttribute("data-id")); });
+    $("tbMemb").addEventListener("keydown", function(e){ if (e.key === "Enter") { var tr = e.target.closest("tr[data-id]"); if (tr) ficha(tr.getAttribute("data-id")); } });
     filtrar();
   }
   function servico(t, d){ return '<div class="card"><h3>' + t + '</h3><p style="color:var(--muted);margin:0">' + d + '</p></div>'; }
   function kpiSimples(rot, val, sub){ return '<div class="card kpi"><div class="rotulo">' + rot + '</div><div class="valor num">' + val + '</div><span class="sub">' + sub + '</span></div>'; }
   function campoSel(id, rot, ops){ return '<div class="campo"><label for="' + id + '">' + rot + '</label><select id="' + id + '"><option value="">Todas</option>' + ops.map(function(o){ return '<option>' + o + '</option>'; }).join("") + '</select></div>'; }
-  function chipSit(s){ return s === "Ativo" ? "ativo" : s === "Férias" ? "ferias" : "afastado"; }
-  function contar(campo){ var c = {}; FUNC.forEach(function(f){ c[f[campo]] = (c[f[campo]] || 0) + 1; }); return Object.keys(c).map(function(k){ return [k, c[k]]; }).sort(function(a,b){ return b[1] - a[1]; }); }
+  function contar(lista, campo){ var c = {}; lista.forEach(function(f){ c[f[campo]] = (c[f[campo]] || 0) + 1; }); return Object.keys(c).map(function(k){ return [k, c[k]]; }).sort(function(a,b){ return b[1] - a[1]; }); }
   function barras(id, l){
     var mx = Math.max.apply(null, l.map(function(x){ return x[1]; }));
     $(id).innerHTML = l.map(function(x){
       return '<div class="barra"><span>' + x[0] + '</span><div class="trilho"><div class="cheio" style="width:' + (x[1] / mx * 100) + '%"></div></div><span class="num" style="text-align:right">' + x[1] + '</span></div>';
     }).join("");
   }
-  function ficha(mat){
-    var f = FUNC.filter(function(x){ return x.mat === mat; })[0]; if (!f) return;
-    var adm = new Date(f.admissao + "T12:00"), meses = Math.max(0, Math.floor((Date.now() - adm) / (30.44 * 864e5)));
+  function semAcento(t){ return t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function ficha(id){
+    var m = MEMB.filter(function(x){ return x.id === id; })[0]; if (!m) return;
+    var desde = dia(m.desde), meses = Math.max(0, Math.floor((HOJE - desde) / (30.44 * 864e5)));
     var tempo = meses >= 12 ? Math.floor(meses / 12) + " ano(s) e " + (meses % 12) + " mês(es)" : meses + " mês(es)";
-    var email = f.nome.split(" ")[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "") + "." + f.nome.split(" ").slice(-1)[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace("ä","a").replace("ü","u") + "@hanseat.com.br";
+    var p = m.nome.split(" "), email = semAcento(p[0]) + "." + semAcento(p[p.length - 1]) + "@hanseat.com.br", s = situacao(m);
+    var linhas = '<dt>Papel</dt><dd>' + (m.papel === "Cotitular" ? "Cotitular da marca" + (m.admin ? " · Administrador(a)" : "") : "Membro licenciado") + '</dd>' +
+      '<dt>Área</dt><dd>' + m.area + '</dd><dt>Atua como</dt><dd>' + m.atuacao + '</dd><dt>Cidade</dt><dd>' + m.cidade + '</dd>' +
+      '<dt>Na rede desde</dt><dd class="num">' + dataBR(desde) + ' (' + tempo + ')</dd>';
+    if (m.papel !== "Cotitular") linhas +=
+      '<dt>Licença válida até</dt><dd class="num">' + dataBR(dia(m.licencaAte)) + '</dd>' +
+      '<dt>Indicado por</dt><dd>' + esc(nomeDe(m.indicadoPor)) + ' <span style="color:var(--muted)">(recebe o royalty)</span></dd>';
+    linhas += '<dt>E-mail</dt><dd>' + email + '</dd><dt>Situação</dt><dd><span class="chip ' + chipSit(s) + '">' + s + '</span></dd>';
     var d = $("ficha");
-    d.innerHTML = '<div class="ficha-topo"><div class="avatar">' + iniciais(f.nome) + '</div><div><div style="font-size:20px;font-weight:600">' + esc(f.nome) + '</div><div>' + esc(f.cargo) + '</div></div></div>' +
-      '<div class="ficha-corpo"><dl>' +
-        '<dt>Matrícula</dt><dd class="num">' + f.mat + '</dd><dt>Área</dt><dd>' + f.area + '</dd><dt>Vínculo</dt><dd>' + f.vinculo + '</dd>' +
-        '<dt>Cidade</dt><dd>' + f.cidade + '</dd><dt>Admissão</dt><dd class="num">' + dataBR(adm) + '</dd><dt>Tempo de casa</dt><dd>' + tempo + '</dd>' +
-        '<dt>E-mail</dt><dd>' + email + '</dd><dt>Situação</dt><dd><span class="chip ' + chipSit(f.situacao) + '">' + f.situacao + '</span></dd>' +
-      '</dl><form method="dialog"><button class="btn">Fechar</button></form></div>';
+    d.innerHTML = '<div class="ficha-topo"><div class="avatar">' + iniciais(m.nome) + '</div><div><div style="font-size:20px;font-weight:600">' + esc(m.nome) + '</div><div>' + esc(m.especialidade) + '</div></div></div>' +
+      '<div class="ficha-corpo"><dl>' + linhas + '</dl><form method="dialog"><button class="btn">Fechar</button></form></div>';
     d.showModal();
   }
 
@@ -245,7 +266,7 @@
   /* ---------- Desenvolvedores ---------- */
   function desenvolvedores(){
     var a = AREAS[2];
-    app.innerHTML = cabecalho(a, "Desenvolvimento sob medida", "Do site institucional ao sistema interno: o time de desenvolvedores do Hub constrói, publica e mantém.") +
+    app.innerHTML = cabecalho(a, "Desenvolvimento sob medida", "Do site institucional ao sistema interno: desenvolvedores independentes da rede constroem, publicam e mantêm.") +
       '<div class="grade g4">' +
         servico("Sites e portais", "Sites institucionais e portais com área do cliente, publicados com domínio próprio.") +
         servico("Automações", "Rotinas que hoje são manuais: conciliações, planilhas, lançamentos e relatórios.") +
@@ -262,7 +283,7 @@
         '<div><span class="rotulo">Exemplo ao vivo</span><div class="card" style="margin-top:12px"><h3>Cotações em tempo real</h3>' +
           '<p style="color:var(--muted)">A área de Bolsa de Valores deste portal lê a B3, o câmbio e o Banco Central direto do navegador e se atualiza sozinha, no mesmo modelo de uma apuração eleitoral ao vivo.</p>' +
           '<a class="btn" href="#/bolsa">Ver a Bolsa</a></div>' +
-          '<div class="card" style="margin-top:16px"><h3>Solicitar um projeto</h3><p style="color:var(--muted)">Conte o que precisa e o time retorna com uma proposta.</p>' +
+          '<div class="card" style="margin-top:16px"><h3>Falar com um desenvolvedor</h3><p style="color:var(--muted)">Conte o que precisa e indicamos o membro da rede com o perfil certo. A proposta e o contrato são feitos diretamente com ele.</p>' +
           '<a class="btn primario" href="mailto:contato@hanseat.com.br?subject=Projeto%20-%20Desenvolvedores%20Hanseat">Enviar e-mail</a></div></div>' +
       '</div>';
   }
